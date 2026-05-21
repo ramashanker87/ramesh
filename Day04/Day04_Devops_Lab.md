@@ -39,7 +39,7 @@ CloudWatch Logs
     - Repository name: devops-training-repo
 
      aws codecommit create-repository \
-      --repository-name devops-training-repo-ramesh \
+      --repository-name devops-training-repo-rama \
       --repository-description "DevOps Training Repository" --profile devops
 
 ---
