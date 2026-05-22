@@ -39,7 +39,7 @@ CloudWatch Logs
     - Repository name: devops-training-repo
 
      aws codecommit create-repository \
-      --repository-name devops-training-repo-rama \
+      --repository-name devops-training-repo-ramesh \
       --repository-description "DevOps Training Repository" --profile devops
 
 ---
@@ -52,9 +52,15 @@ CloudWatch Logs
 # STEP 2 – Clone Repository
 
     git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/devops-training-repo-rama
-    cd devops-training-repo-rama
+    cd devops-training-repo-ramesh
 
 ---
+# Confugure AWS account
+    aws configure
+    #Give Access key
+    #Access key id
+    #region : us-east-1
+    #format : json
 
 # STEP 3 – Create Project Files
 
@@ -106,13 +112,13 @@ git push origin master
 
 #  STEP 5 – Create S3 Bucket
 
-    - devops-training-build-artifacts-rama
+    - devops-training-build-artifacts-ramesh
 
 ---
 
 
 #  STEP 7 – CodeBuild Project
-    project name: devops-build-rama
+    project name: devops-build-ramesh
     Source: CodeCommit
     repository: devops-training-repo-rama
     Branch: master
