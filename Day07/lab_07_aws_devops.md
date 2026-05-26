@@ -49,10 +49,10 @@ Replace these values throughout the lab:
 
 | Placeholder | Replace With |
 |---|---|
-| `<KEY-FILE>` | Your EC2 key file, for example `rama-ec2.pem` |
-| `<APP-IP>` | Public IP of the application server |
-| `<JENKINS-IP>` | Public IP of the Jenkins server |
-| `<USERNAME>` | Your GitHub username |
+| `ramesh_key_pair.pem` | Your EC2 key file, for example `rama-ec2.pem` |
+| `18.234.238.28` | Public IP of the application server |
+| `54.87.51.147` | Public IP of the Jenkins server |
+| `ramashanker87` | Your GitHub username |
 
 ---
 
@@ -99,8 +99,8 @@ ssh -i <KEY-FILE> ec2-user@<APP-IP>
 Example:
 
 ```bash
-chmod 400 rama-ec2.pem
-ssh -i rama-ec2.pem ec2-user@54.147.209.103
+chmod 400 "ramesh_key_pair.pem"
+ssh -i "ramesh_key_pair.pem" ec2-user@ec2-54-87-51-147.compute-1.amazonaws.com
 ```
 
 ---
@@ -311,7 +311,7 @@ Jenkins needs SSH access to the application server.
 On your local machine, open your EC2 private key file:
 
 ```bash
-cat <KEY-FILE>
+cat ramesh_key_pair.pem
 ```
 
 Copy the full private key content, including:
@@ -421,7 +421,7 @@ Paste this pipeline script.
 Replace:
 
 - `<USERNAME>` with your GitHub username
-- `<APP-IP>` with your application server public IP
+- `54.87.51.147` with your application server public IP
 
 ```groovy
 pipeline {
@@ -430,7 +430,7 @@ pipeline {
     stages {
         stage('Clone GitHub Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/<USERNAME>/jenkins-demo.git'
+                git branch: 'main', url: 'https://github.com/ramashanker87/jenkins-demo.git'
             }
         }
 
@@ -438,15 +438,16 @@ pipeline {
             steps {
                 sshagent(['ec2-key']) {
                     sh '''
-                    scp -o StrictHostKeyChecking=no index.html ec2-user@<APP-IP>:/tmp/index.html
+                    scp -o StrictHostKeyChecking=no index.html ec2-user@13.221.18.62:/tmp/index.html
 
-                    ssh -o StrictHostKeyChecking=no ec2-user@<APP-IP> "sudo cp /tmp/index.html /var/www/html/index.html && sudo systemctl restart httpd"
+                    ssh -o StrictHostKeyChecking=no ec2-user@13.221.18.62 "sudo cp /tmp/index.html /var/www/html/index.html && sudo systemctl restart httpd"
                     '''
                 }
             }
         }
     }
 }
+
 ```
 
 Click:

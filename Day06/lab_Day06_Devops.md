@@ -123,7 +123,7 @@ AmazonS3ReadOnlyAccess
 Role name:
 
 ```text
-Rama_EC2_CodeDeploy_Role
+EC2_Pipe_Rama_Role
 ```
 
 Attach role to EC2:
@@ -213,7 +213,8 @@ The AWS CodeDeploy agent is running
 Verify IAM credentials:
 
 ```bash
-curl http://169.254.169.254/latest/meta-data/iam/security-credentials/
+sudo yum install curl -y
+curl http://54.198.227.76/latest/meta-data/iam/security-credentials/
 ```
 
 Should return:
@@ -312,11 +313,14 @@ Copy files into repository folder.
 Run:
 
 ```bash
+aws sts get-caller-identity --profile devops
+git config --global credential.helper '!aws codecommit credential-helper $@'
+git config --global credential.UseHttpPath true
+export AWS_PROFILE=devops
+
 git add .
-
 git commit -m "Initial commit"
-
-git push origin main
+git push origin master
 ```
 
 ---
@@ -523,11 +527,11 @@ Build Custom Pipeline
 
 ## Source Stage
 
-| Setting | Value |
-|---|---|
-| Source Provider | AWS CodeCommit |
+| Setting | Value                |
+|---|----------------------|
+| Source Provider | AWS CodeCommit       |
 | Repository | sample-app-repo-rama |
-| Branch | main |
+| Branch | master               |
 
 ---
 
@@ -565,6 +569,10 @@ Source → Build → Deploy
 All stages should become green.
 
 ---
+
+## Verify any Error in deploy.
+    
+    sudo grep -i -A10 -B10 "Install\|UnknownError\|error\|failed" /var/log/aws/codedeploy-agent/codedeploy-agent.log
 
 # Step 15 – Validate Deployment
 
@@ -726,6 +734,7 @@ sudo systemctl restart httpd
 
 ```bash
 sudo tail -n 100 /var/log/aws/codedeploy-agent/codedeploy-agent.log
+sudo grep -i -A10 -B10 "Install\|UnknownError\|error\|failed" /var/log/aws/codedeploy-agent/codedeploy-agent.log
 ```
 
 ---
