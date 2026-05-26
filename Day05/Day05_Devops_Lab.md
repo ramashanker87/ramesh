@@ -100,6 +100,7 @@ SSH into each EC2 instance.
 ssh -i mykey.pem ec2-user@<EC2-PUBLIC-IP>
 ```
 
+
 ssh -i "ramesh_key_pair.pem" ec2-user@ec2-3-90-35-150.compute-1.amazonaws.com  --blue-1
 ssh -i "ramesh_key_pair.pem" ec2-user@ec2-3-80-104-42.compute-1.amazonaws.com  --blue-2
 ssh -i "ramesh_key_pair.pem" ec2-user@ec2-54-160-238-210.compute-1.amazonaws.com  -- green-1
