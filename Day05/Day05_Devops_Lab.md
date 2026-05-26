@@ -275,6 +275,7 @@ systemctl restart httpd
 ```bash
 chmod +x scripts/install.sh
 chmod +x scripts/start_server.sh
+
 ```
 
 ---
