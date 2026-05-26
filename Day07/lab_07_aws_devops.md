@@ -470,6 +470,7 @@ Open:
 
 ```text
 Console Output
+
 ```
 
 The build should finish successfully.
