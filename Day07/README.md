@@ -1,7 +1,7 @@
 ## Day 7 — 26-May-2026 (Tuesday)
 
 ### Module
-**Module 1 – DevOps & CI/CD Fundamentals**
+***Module 1 – DevOps & CI/CD Fundamentals***
 
 ### Theory
 - Jenkins
