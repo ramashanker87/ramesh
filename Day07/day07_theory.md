@@ -1,7 +1,7 @@
 # Day 7 – DevOps Theory
 
 ## Module 1 – DevOps & CI/CD Fundamentals
-### Date: 26-May-2026 (Tuesday)
+### Date: 26-may-2026 (Tuesday) lab comppleted
 
 ---
 
