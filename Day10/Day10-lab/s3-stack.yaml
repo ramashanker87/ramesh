@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Create S3 Bucket
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+Resources:
+  RameshDemoBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${EnvironmentName}-demo-bucket-ramesh"
+
+Outputs:
+  BucketName:
+    Value: !Ref RameshDemoBucket

@@ -1,0 +1,7 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-template-storage-demo-ramesh.s3.amazonaws.com/network.yaml
