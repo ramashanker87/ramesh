@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Reusable EC2 Web Server Template for Dev, Test, and Prod
+
+Parameters:
+
+  Environment:
+    Type: String
+    Description: Environment Name
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Existing EC2 Key Pair
+
+Resources:
+
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH Access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: !Sub "${Environment}-web-sg"
+
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+
+      KeyName: !Ref KeyPairName
+
+      # Update AMI ID according to your region if needed
+      ImageId: ami-0f58b397bc5c1f2e8
+
+      SecurityGroups:
+        - !Ref WebServerSecurityGroup
+
+      Tags:
+        - Key: Name
+          Value: !Sub "rama-${Environment}-web-server"
+
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+
+          systemctl start httpd
+          systemctl enable httpd
+
+          cat > /var/www/html/index.html << EOF
+          <html>
+          <head><title>${Environment} Server</title></head>
+          <body>
+            <h1>Welcome to ${Environment} server</h1>
+          </body>
+          </html>
+          EOF
+
+Outputs:
+
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref WebServer
+
+  PublicIP:
+    Description: Public IP Address
+    Value: !GetAtt WebServer.PublicIp
+
+  URL:
+    Description: Web Server URL
+    Value: !Sub "http://${WebServer.PublicIp}"
