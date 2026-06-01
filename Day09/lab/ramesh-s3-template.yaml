@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an S3 bucket
+
+Resources:
+  RameshS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ramesh-day09-bucket-12345
+
+Outputs:
+  BucketName:
+    Value: !Ref RameshS3Bucket
