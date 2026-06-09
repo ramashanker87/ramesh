@@ -267,8 +267,8 @@ Add and update the bucket name:
 ```hcl
 aws_region          = "us-east-1"
 environment         = "dev"
-project_name        = "day11-terraform"
-bucket_name         = "yourname-day11-terraform-demo-bucket-20260520"
+project_name        = "day11-terraform-ramesh"
+bucket_name         = "ramesh-day11-terraform-demo-bucket-20260520"
 vpc_cidr            = "10.10.0.0/16"
 public_subnet_cidr  = "10.10.1.0/24"
 instance_type       = "t2.micro"
@@ -370,7 +370,7 @@ Check bucket versioning:
 
 ```bash
 aws s3api get-bucket-versioning \
---bucket yourname-day11-terraform-demo-bucket-20260520
+--bucket ramesh-day11-terraform-demo-bucket-20260520
 ```
 
 ---

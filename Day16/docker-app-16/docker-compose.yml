@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  ramesh-app:
+    image: ramesh-ecr:v2
+    container_name: ramesh-app
+    ports:
+      - "8080:8080"
+#    environment:
+#      APP_MESSAGE1: "Hello from Training Day 16! "
+#      APP_MESSAGE2: "Learning docker compose"
+    restart: unless-stopped

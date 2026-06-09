@@ -369,7 +369,7 @@ terraform plan
 
 ---
 
-# Part 7 — Simulate Automated IaC Pipeline
+# Part 7 — Simulate Automated IaC Pipeline 
 
 ---
 
@@ -378,7 +378,7 @@ terraform plan
 Example pipeline:
 
 ```text
-Git Push
+Code Commit Push
    ↓
 Terraform fmt
    ↓
@@ -386,11 +386,7 @@ Terraform validate
    ↓
 tfsec scan
    ↓
-Checkov scan
-   ↓
 Terraform plan
-   ↓
-Manual approval
    ↓
 Terraform apply
 ```
@@ -418,9 +414,6 @@ terraform validate
 
 echo "Running tfsec..."
 tfsec .
-
-echo "Running Checkov..."
-checkov -d .
 
 echo "Initialize Terraform..."
 terraform init
@@ -480,13 +473,13 @@ yes
 Check S3 buckets:
 
 ```bash
-aws s3 ls
+aws s3 ls --profile devops
 ```
 
 Check security groups:
 
 ```bash
-aws ec2 describe-security-groups
+aws ec2 describe-security-groups --profile devops
 ```
 
 ---
@@ -594,7 +587,7 @@ Terraform Apply
 
 ---
 
-# Example buildspec.yml
+# Example buildspec.yml  :assignment
 
 ```yaml
 version: 0.2

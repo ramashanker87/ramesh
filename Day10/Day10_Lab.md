@@ -54,7 +54,6 @@ s3-stack.yaml
 ```
 
 ```yaml
-AWSTemplateFormatVersion: '2010-09-09'
 
 Description: Create S3 Bucket
 
@@ -64,14 +63,14 @@ Parameters:
     Default: dev
 
 Resources:
-  DemoBucket:
+  RameshDemoBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${EnvironmentName}-demo-bucket"
+      BucketName: !Sub "${EnvironmentName}-demo-bucket-ramesh"
 
 Outputs:
   BucketName:
-    Value: !Ref DemoBucket
+    Value: !Ref RameshDemoBucket
 ```
 
 ---
@@ -87,7 +86,7 @@ aws cloudformation validate-template --template-body file://s3-stack.yaml --prof
 # Step 4 — Deploy Stack
 
 ```bash
-aws cloudformation create-stack --stack-name s3-demo-stack --template-body file://s3-stack.yaml --parameters ParameterKey=EnvironmentName,ParameterValue=dev --profile devops
+aws cloudformation create-stack --stack-name s3-demo-stack-ramesh --template-body file://s3-stack.yaml --parameters ParameterKey=EnvironmentName,ParameterValue=dev --profile devops
 ```
 
 ---
@@ -95,7 +94,7 @@ aws cloudformation create-stack --stack-name s3-demo-stack --template-body file:
 # Step 5 — Verify Deployment
 
 ```bash
-aws cloudformation describe-stacks --stack-name s3-demo-stack --profile devops
+aws cloudformation describe-stacks --stack-name s3-demo-stack-ramesh --profile devops
 ```
 
 ---
@@ -113,7 +112,7 @@ network.yaml
 AWSTemplateFormatVersion: '2010-09-09'
 
 Resources:
-  DemoVPC:
+  RameshDemoVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
@@ -124,7 +123,7 @@ Resources:
 # Step 2 — Create S3 Bucket
 
 ```bash
-aws s3 mb s3://cf-template-storage-demo --profile devops
+aws s3 mb s3://cf-template-storage-demo-ramesh --profile devops
 ```
 
 ---
@@ -132,7 +131,7 @@ aws s3 mb s3://cf-template-storage-demo --profile devops
 # Step 3 — Upload Child Template
 
 ```bash
-aws s3 cp network.yaml s3://cf-template-storage-demo/ --profile devops
+aws s3 cp network.yaml s3://cf-template-storage-demo-ramesh/ --profile devops
 ```
 
 ---
@@ -151,7 +150,7 @@ Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://cf-template-storage-demo.s3.amazonaws.com/network.yaml
+      TemplateURL: https://cf-template-storage-demo-ramesh.s3.amazonaws.com/network.yaml
 ```
 
 ---
@@ -159,12 +158,51 @@ Resources:
 # Step 5 — Deploy Parent Stack
 
 ```bash
-aws cloudformation create-stack --stack-name parent-stack --template-body file://parent-stack.yaml --profile devops
+aws cloudformation create-stack --stack-name parent-stack-ramesh --template-body file://parent-stack.yaml --profile devops
 ```
 
 ---
 
 # Lab 3 — Multi-Environment Provisioning
+
+## environment stack
+
+```
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Multi-environment CloudFormation template
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: Deployment environment
+
+Resources:
+  EnvironmentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${Environment}-demo-bucket-${AWS::AccountId}"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+        - Key: ManagedBy
+          Value: CloudFormation
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket
+    Value: !Ref EnvironmentBucket
+
+  BucketArn:
+    Description: ARN of the S3 bucket
+    Value: !GetAtt EnvironmentBucket.Arn
+```
+
 
 ## Deploy Dev Environment
 
@@ -189,6 +227,122 @@ aws cloudformation create-stack --stack-name prod-stack --template-body file://e
 ```
 
 ---
+
+## Creating Reusable EC2 Web Server Template for Dev, Test, and Prod
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Reusable EC2 Web Server Template for Dev, Test, and Prod
+
+Parameters:
+
+  Environment:
+    Type: String
+    Description: Environment Name
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Existing EC2 Key Pair
+
+Resources:
+
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH Access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: !Sub "${Environment}-web-sg"
+
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+
+      KeyName: !Ref KeyPairName
+
+      # Update AMI ID according to your region if needed
+      ImageId: ami-0f58b397bc5c1f2e8
+
+      SecurityGroups:
+        - !Ref WebServerSecurityGroup
+
+      Tags:
+        - Key: Name
+          Value: !Sub "rama-${Environment}-web-server"
+
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+
+          systemctl start httpd
+          systemctl enable httpd
+
+          cat > /var/www/html/index.html << EOF
+          <html>
+          <head><title>${Environment} Server</title></head>
+          <body>
+            <h1>Welcome to ${Environment} server</h1>
+          </body>
+          </html>
+          EOF
+
+Outputs:
+
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref WebServer
+
+  PublicIP:
+    Description: Public IP Address
+    Value: !GetAtt WebServer.PublicIp
+
+  URL:
+    Description: Web Server URL
+    Value: !Sub "http://${WebServer.PublicIp}"
+```
+
+## Deploy Dev Environment
+
+```bash
+aws cloudformation create-stack --stack-name rama-dev-stack --template-body file://environment-stack.yaml \
+--parameters ParameterKey=Environment,ParameterValue=dev ParameterKey=KeyPairName=my-keypair --profile devops
+```
+
+---
+
+## Deploy Test Environment
+
+```bash
+aws cloudformation create-stack --stack-name rama-test-stack --template-body file://environment-stack.yaml \
+--parameters ParameterKey=Environment,ParameterValue=test ParameterKey=KeyPairName,my-keypair --profile devops
+```
+
+---
+
+## Deploy Prod Environment
+
+```bash
+aws cloudformation create-stack --stack-name rama-prod-stack --template-body file://environment-stack.yaml \
+--parameters ParameterKey=Environment,ParameterValue=prod ParameterKey=KeyPairName,ParameterValue=my-keypair --profile devops
+```
 
 # Lab 4 — StackSets Demonstration
 
@@ -256,4 +410,14 @@ Participants will:
 - Create Nested Stacks
 - Understand StackSets
 - Provision multiple environments
+
+## Assignment
+
+    Create three EC2 multienvironment dev test prod
+    example: rama-dev-web-server,rama-test-web-server,rama-prod-web-server
+    Each of EC2 should have we server install and have index.html
+    When access dev it should display
+        Welcome to Dev server
+    Similarly for test and prod
+     Make sure its accessible through http IP address.
 
