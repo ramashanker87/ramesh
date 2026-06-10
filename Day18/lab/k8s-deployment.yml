@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rameshday18
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ramesh-ecr-app
+  namespace: rameshday18
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ramesh-ecr-app
+  template:
+    metadata:
+      labels:
+        app: ramesh-ecr-app
+    spec:
+      containers:
+        - name: ramesh-ecr-container
+          image: 386757865964.dkr.ecr.us-east-1.amazonaws.com/ramesh-ecr:v2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
