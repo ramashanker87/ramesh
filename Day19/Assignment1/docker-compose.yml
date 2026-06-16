@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  ecs-app:
+    build:
+      context: ./
+
+    environment:
+      PARTICIPANT_NAME: Ramesh
+
+  eks-app:
+    build:
+      context: ./
+
+    environment:
+      PARTICIPANT_NAME: Ramesh
